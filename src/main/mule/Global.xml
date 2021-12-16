@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<http:request-config name="HTTP_Request_configuration_movies" doc:name="HTTP Request configuration" doc:id="9a32692d-6767-4aad-8974-1506cf5d7841" basePath="${movies.httpRequest.basePath}" >
+		<http:request-connection host="${movies.httpRequest.host}" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_bookings" doc:name="HTTP Request configuration" doc:id="5cbe5c03-84e4-4e43-b46c-75b58f737089" basePath="${bookings.httpRequest.basePath}" >
+		<http:request-connection host="${bookings.httpRequest.host}" />
+	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="74fc4b32-86b5-4b94-9342-6b6e2d243b9f" file="Config.yaml" />
+	<http:listener-config name="bookmyshow-exp-api-httpListenerConfig" doc:name="HTTP Listener config" doc:id="b9b8811d-6fdc-446e-a2ab-affc93f0b97a" >
+		<http:listener-connection host="${http.host}" port="${http.port}" />
+	</http:listener-config>
+	<api-gateway:autodiscovery apiId="${autoDiscovery.Id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="e8725ce5-8698-4997-8b5a-9e7ec2bd7fb2" flowRef="${autoDiscovery.flowName}" />
+</mule>
