@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:book-my-show-prc-api="http://www.mulesoft.org/schema/mule/book-my-show-prc-api"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:book-my-show-movies-sys-api="http://www.mulesoft.org/schema/mule/book-my-show-movies-sys-api" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/book-my-show-movies-sys-api http://www.mulesoft.org/schema/mule/book-my-show-movies-sys-api/current/mule-book-my-show-movies-sys-api.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/book-my-show-prc-api http://www.mulesoft.org/schema/mule/book-my-show-prc-api/current/mule-book-my-show-prc-api.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<flow name="getMovies" doc:id="d62b8f13-c5b5-44fa-af9a-9c3273c41d23" >
+		<http:request method="GET" doc:name="get movies" doc:id="16509d06-d3a8-4a1a-af0a-c844ffed924b" config-ref="HTTP_Request_configuration_movies" path="${movies.httpRequest.getMoviesPath}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	client_secret : p('movies.httpRequest.client_secret'),
+	client_id : p('movies.httpRequest.client_id')
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="get movies response" doc:id="ed67f6c4-e61a-4ccf-a611-ac52cbd389fc" message="#[payload]"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="fdceaf2d-03d3-4d10-800f-87c92a21dcea" type="ANY">
+				<ee:transform doc:name="set error payload" doc:id="d3cb34a4-5c02-4f69-87cb-2e897d3e911e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error_type: "500 Internal server Error",
+	error_description: "Internal server Error"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[output application/json
+---
+500]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="INFO" doc:name="error" doc:id="7d1ef437-aed5-4846-9b0d-82edcada624e" message="#[payload]"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="bookTickets" doc:id="9d10cae6-90a8-4b61-8f58-2385a9566855" >
+		<http:request method="POST" doc:name="book tickets" doc:id="54219fae-1098-431f-87d3-658a54a5a849" config-ref="HTTP_Request_configuration_bookings" path="${bookings.httpRequest.getBookingsPath}">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	client_secret : p('bookings.httpRequest.client_secret'),
+	client_id : p('bookings.httpRequest.client_id')
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="booking response" doc:id="09bb8e0e-2f30-4e50-a2f2-f46abb76d0c6" message="#[payload]"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b2f009c5-2e0f-4fdf-b056-cf7ffd4c594a" type="HTTP:BAD_REQUEST">
+				<ee:transform doc:name="set error payload" doc:id="10e95c1b-d887-4512-8fc3-fc32c083fc8b" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error_type: "400 bad request",
+	error_description: "Unable to process further as offer code invalid"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/json
+---
+400]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="INFO" doc:name="error" doc:id="189b9f28-3f33-4742-a2e3-b8a69156cdb1" message="#[payload]"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>

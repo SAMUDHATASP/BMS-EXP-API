@@ -1,0 +1,25 @@
+http:
+  host: "0.0.0.0"
+  port: "8081"
+  
+autoDiscovery:
+  Id: "17509475"
+  flowName: "bookmyshow-exp-api-main"
+  
+movies:
+  httpRequest:
+    host: "bms-movies-sys-api.us-e2.cloudhub.io"
+    basePath: "/api"
+    getMoviesPath: "/movies"
+    client_id: "b35bc101ba80451f8c0436ce351fa09b"
+    client_secret: "6B0Ca4d2036B431786f9ff93e127E593"
+    
+bookings:
+  httpRequest:
+    host: "bms-prc-api.us-e2.cloudhub.io"
+    basePath: "/api"
+    getBookingsPath: "/bookings"
+    client_id: "e413aeb03500425983742496709f88b6"
+    client_secret: "f51A0750EbDD43D6b60D4Ec2A80593B1"
+    
+
